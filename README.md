@@ -14,7 +14,7 @@ Alternative installation is possible without local dependencies relying on [Dock
 
 Clone the repository
 
-    git clone git@github.com:gothinkster/arcacare-api.git
+    git clone git@bitbucket.org:arcadev/arcacare-api.git
 
 Switch to the repo folder
 
@@ -76,7 +76,7 @@ docker-compose exec php php artisan migrate
 docker-compose exec php php -S localhost:8000 -t public
 ```
 
-The api can be accessed at [http://localhost:8000/api](http://localhost:8000/api).    
+The api can be accessed at [http://localhost:8000/api/documentation](http://localhost:8000/api/documentation).    
 
  
 # Swagger Lume Documentaion setup with Authentication
@@ -88,7 +88,7 @@ Install all the Swagger Lume dependencies using composer
 Open your bootstrap/app.php file and:
 uncomment this line (around line 26) in Create The Application section:
    
-   $app->withFacades();
+     $app->withFacades();
 
 
 add this line before Register Container Bindings section:
@@ -132,13 +132,12 @@ add this in security section in config/swagger-lume.php:
 
 - `app` - Contains all the Eloquent models
 - `app/Http/Controllers/Api` - Contains all the api controllers
-- `app/Http/Middleware` - Contains the JWT auth middleware
-- `app/Http/Requests/Api` - Contains all the api form requests
+- `app/Http/Middleware` - Contains the api auth middleware
 - `config` - Contains all the application configuration files
 - `database/factories` - Contains the model factory for all the models
 - `database/migrations` - Contains all the database migrations
 - `database/seeds` - Contains the database seeder
-- `routes` - Contains all the api routes defined in api.php file
+- `routes` - Contains all the api routes defined in web.php file
 - `tests` - Contains all the application tests
 - `tests/Feature/Api` - Contains all the api tests
 
@@ -158,7 +157,7 @@ Run the laravel development server
 
 The api can now be accessed at
 
-    http://localhost:8000/api
+    http://localhost:8000/api/documentation
 
 Request headers
 
