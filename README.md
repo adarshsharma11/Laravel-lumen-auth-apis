@@ -1,10 +1,6 @@
-# ![Arcacare Api App]
+# Arcacare Api App
 
 [![Build Status](https://img.shields.io/travis/gothinkster/laravel-realworld-example-app/master.svg)](https://travis-ci.org/gothinkster/laravel-realworld-example-app) [![Gitter](https://img.shields.io/gitter/room/realworld-dev/laravel.svg)](https://gitter.im/realworld-dev/laravel) [![GitHub stars](https://img.shields.io/github/stars/gothinkster/laravel-realworld-example-app.svg)](https://github.com/gothinkster/laravel-realworld-example-app/stargazers) [![GitHub license](https://img.shields.io/github/license/gothinkster/laravel-realworld-example-app.svg)](https://raw.githubusercontent.com/gothinkster/laravel-realworld-example-app/master/LICENSE)
-
-> ### Example Laravel codebase containing real world examples (CRUD, auth, advanced patterns and more) that adheres to the [RealWorld](https://github.com/gothinkster/realworld-example-apps) spec and API.
-
-This repo is functionality complete — PRs and issues welcome!
 
 ----------
 
@@ -12,17 +8,17 @@ This repo is functionality complete — PRs and issues welcome!
 
 ## Installation
 
-Please check the official laravel installation guide for server requirements before you start. [Official Documentation](https://laravel.com/docs/5.4/installation#installation)
+Please check the official laravel installation guide for server requirements before you start. [Official Documentation](https://lumen.laravel.com/docs/8.x/installation)
 
 Alternative installation is possible without local dependencies relying on [Docker](#docker). 
 
 Clone the repository
 
-    git clone git@github.com:gothinkster/laravel-realworld-example-app.git
+    git clone git@github.com:gothinkster/arcacare-api.git
 
 Switch to the repo folder
 
-    cd laravel-realworld-example-app
+    cd arcacare-api
 
 Install all the dependencies using composer
 
@@ -36,7 +32,7 @@ Generate a new application key
 
     php artisan key:generate
 
-Generate a new JWT authentication secret key
+Generate a new API authentication token key
 
     php artisan jwt:generate
 
@@ -46,76 +42,91 @@ Run the database migrations (**Set the database connection in .env before migrat
 
 Start the local development server
 
-    php artisan serve
+    php -S localhost:800 -t public 
 
 You can now access the server at http://localhost:8000
 
 **TL;DR command list**
 
-    git clone git@github.com:gothinkster/laravel-realworld-example-app.git
-    cd laravel-realworld-example-app
+    git clone git@bitbucket.org:arcadev/arcacare-api.git
+    cd arcacare-api
     composer install
     cp .env.example .env
     php artisan key:generate
-    php artisan jwt:generate 
     
 **Make sure you set the correct database connection information before running the migrations** [Environment variables](#environment-variables)
 
     php artisan migrate
-    php artisan serve
+    php -S localhost:8000 -t public 
 
-## Database seeding
 
-**Populate the database with seed data with relationships which includes users, articles, comments, tags, favorites and follows. This can help you to quickly start testing the api or couple a frontend and start using it with ready content.**
-
-Open the DummyDataSeeder and set the property values as per your requirement
-
-    database/seeds/DummyDataSeeder.php
-
-Run the database seeder and you're done
-
-    php artisan db:seed
-
-***Note*** : It's recommended to have a clean database before seeding. You can refresh your migrations at any point to clean the database by running the following command
-
-    php artisan migrate:refresh
-    
 ## Docker
 
 To install with [Docker](https://www.docker.com), run following commands:
 
 ```
-git clone git@github.com:gothinkster/laravel-realworld-example-app.git
-cd laravel-realworld-example-app
+git clone git@bitbucket.org:arcadev/arcacare-api.git
+cd arcacare-api
 cp .env.example.docker .env
 docker run -v $(pwd):/app composer install
 cd ./docker
 docker-compose up -d
 docker-compose exec php php artisan key:generate
-docker-compose exec php php artisan jwt:generate
 docker-compose exec php php artisan migrate
-docker-compose exec php php artisan db:seed
-docker-compose exec php php artisan serve --host=0.0.0.0
+docker-compose exec php php -S localhost:8000 -t public
 ```
 
-The api can be accessed at [http://localhost:8000/api](http://localhost:8000/api).
+The api can be accessed at [http://localhost:8000/api](http://localhost:8000/api).    
 
-## API Specification
+ 
+# Swagger Lume Documentaion setup with Authentication
+ 
+Install all the Swagger Lume dependencies using composer
 
-This application adheres to the api specifications set by the [Thinkster](https://github.com/gothinkster) team. This helps mix and match any backend with any other frontend without conflicts.
+       composer require "darkaonline/swagger-lume:8.*"
 
-> [Full API Spec](https://github.com/gothinkster/realworld/tree/master/api)
+Open your bootstrap/app.php file and:
+uncomment this line (around line 26) in Create The Application section:
+   
+   $app->withFacades();
 
-More information regarding the project can be found here https://github.com/gothinkster/realworld
 
-----------
+add this line before Register Container Bindings section:
+
+     $app->configure('swagger-lume');
+
+add this line in Register Service Providers section:
+
+    $app->register(\SwaggerLume\ServiceProvider::class);
+
+Run php artisan swagger-lume:publish-config to publish configs (config/swagger-lume.php)
+Make configuration changes if needed
+Run php artisan swagger-lume:publish to publish everything    
+
+
+## Authentication
+
+add this in security section in config/swagger-lume.php:
+
+      'bearer_token' => [ // Unique name of security
+            'type' => 'apiKey', // Valid values are "basic", "apiKey" or "oauth2".
+            'description' => 'Enter token in format (Bearer <token>)',
+            'name' => 'Authorization', // The name of the header or query parameter to be used.
+            'in' => 'header', // The location of the API key. Valid values are "query" or "header".
+         ],
+
+ you can follow this guid for authentication
+ 
+   https://lumen.laravel.com/docs/8.x/authentication
+
+----------    
+
 
 # Code overview
 
 ## Dependencies
 
-- [jwt-auth](https://github.com/tymondesigns/jwt-auth) - For authentication using JSON Web Tokens
-- [laravel-cors](https://github.com/barryvdh/laravel-cors) - For handling Cross-Origin Resource Sharing (CORS)
+- [api_token](https://lumen.laravel.com/docs/8.x/authentication) - For authentication using JSON Web Tokens
 
 ## Folders
 
@@ -123,12 +134,6 @@ More information regarding the project can be found here https://github.com/goth
 - `app/Http/Controllers/Api` - Contains all the api controllers
 - `app/Http/Middleware` - Contains the JWT auth middleware
 - `app/Http/Requests/Api` - Contains all the api form requests
-- `app/RealWorld/Favorite` - Contains the files implementing the favorite feature
-- `app/RealWorld/Filters` - Contains the query filters used for filtering api requests
-- `app/RealWorld/Follow` - Contains the files implementing the follow feature
-- `app/RealWorld/Paginate` - Contains the pagination class used to paginate the result
-- `app/RealWorld/Slug` - Contains the files implementing slugs to articles
-- `app/RealWorld/Transformers` - Contains all the data transformers
 - `config` - Contains all the application configuration files
 - `database/factories` - Contains the model factory for all the models
 - `database/migrations` - Contains all the database migrations
@@ -149,7 +154,7 @@ More information regarding the project can be found here https://github.com/goth
 
 Run the laravel development server
 
-    php artisan serve
+    php -S localhost:8000 -t public 
 
 The api can now be accessed at
 
@@ -160,26 +165,8 @@ Request headers
 | **Required** 	| **Key**              	| **Value**            	|
 |----------	|------------------	|------------------	|
 | Yes      	| Content-Type     	| application/json 	|
-| Yes      	| X-Requested-With 	| XMLHttpRequest   	|
-| Optional 	| Authorization    	| Token {JWT}      	|
+| Optional 	| Authorization    	| Token {api_token}      	|
 
 Refer the [api specification](#api-specification) for more info.
 
 ----------
- 
-# Authentication
- 
-This applications uses JSON Web Token (JWT) to handle authentication. The token is passed with each request using the `Authorization` header with `Token` scheme. The JWT authentication middleware handles the validation and authentication of the token. Please check the following sources to learn more about JWT.
- 
-- https://jwt.io/introduction/
-- https://self-issued.info/docs/draft-ietf-oauth-json-web-token.html
-
-----------
-
-# Cross-Origin Resource Sharing (CORS)
- 
-This applications has CORS enabled by default on all API endpoints. The default configuration allows requests from `http://localhost:3000` and `http://localhost:4200` to help speed up your frontend testing. The CORS allowed origins can be changed by setting them in the config file. Please check the following sources to learn more about CORS.
- 
-- https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS
-- https://en.wikipedia.org/wiki/Cross-origin_resource_sharing
-- https://www.w3.org/TR/cors
