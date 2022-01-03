@@ -28,14 +28,6 @@ Copy the example env file and make the required configuration changes in the .en
 
     cp .env.example .env
 
-Generate a new application key
-
-    php artisan key:generate
-
-Generate a new API authentication token key
-
-    php artisan jwt:generate
-
 Run the database migrations (**Set the database connection in .env before migrating**)
 
     php artisan migrate
@@ -52,7 +44,6 @@ You can now access the server at http://localhost:8000
     cd arcacare-api
     composer install
     cp .env.example .env
-    php artisan key:generate
     
 **Make sure you set the correct database connection information before running the migrations** [Environment variables](#environment-variables)
 
@@ -67,55 +58,19 @@ To install with [Docker](https://www.docker.com), run following commands:
 ```
 git clone git@bitbucket.org:arcadev/arcacare-api.git
 cd arcacare-api
-cp .env.example.docker .env
-docker run -v $(pwd):/app composer install
-cd ./docker
-docker-compose up -d
-docker-compose exec php php artisan key:generate
-docker-compose exec php php artisan migrate
-docker-compose exec php php -S localhost:8000 -t public
+cp .env.example .env
+docker run --rm -v $(pwd):/app composer install
+Get your uid for current user
+echo $uid 1000
+Update docker-compose.yml file with your own user and uid   
+docker-compose up --build -d
 ```
 
 The api can be accessed at [http://localhost:8000/api/documentation](http://localhost:8000/api/documentation).    
 
- 
-# Swagger Lume Documentaion setup with Authentication
- 
-Install all the Swagger Lume dependencies using composer
-
-       composer require "darkaonline/swagger-lume:8.*"
-
-Open your bootstrap/app.php file and:
-uncomment this line (around line 26) in Create The Application section:
-   
-     $app->withFacades();
-
-
-add this line before Register Container Bindings section:
-
-     $app->configure('swagger-lume');
-
-add this line in Register Service Providers section:
-
-    $app->register(\SwaggerLume\ServiceProvider::class);
-
-Run php artisan swagger-lume:publish-config to publish configs (config/swagger-lume.php)
-Make configuration changes if needed
-Run php artisan swagger-lume:publish to publish everything    
-
-
 ## Authentication
 
-add this in security section in config/swagger-lume.php:
-
-      'bearer_token' => [ // Unique name of security
-            'type' => 'apiKey', // Valid values are "basic", "apiKey" or "oauth2".
-            'description' => 'Enter token in format (Bearer <token>)',
-            'name' => 'Authorization', // The name of the header or query parameter to be used.
-            'in' => 'header', // The location of the API key. Valid values are "query" or "header".
-         ],
-
- you can follow this guid for authentication
+ you can follow this guide for authentication
  
    https://lumen.laravel.com/docs/8.x/authentication
 
