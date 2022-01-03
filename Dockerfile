@@ -33,10 +33,4 @@ RUN mkdir -p /home/$user/.composer && \
 # Set working directory
 WORKDIR /var/www
 
-COPY composer.* ./
-RUN composer install --no-autoloader
-COPY . ./
-RUN composer dump-autoload
-CMD bash -c "composer install"
-
 USER $user

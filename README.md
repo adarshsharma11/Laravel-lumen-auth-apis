@@ -59,20 +59,65 @@ To install with [Docker](https://www.docker.com), run following commands:
 git clone git@bitbucket.org:arcadev/arcacare-api.git
 cd arcacare-api
 cp .env.example .env
+For mac & ubuntu
 docker run --rm -v $(pwd):/app composer install
+For windows
+docker run --rm -v ${pwd}:/app composer install
 Get your uid for current user
 echo $uid 1000
-Update docker-compose.yml file with your own user and uid   
+Update docker-compose.yml file with your own user and uid
+Restart terminal and run from the root fo project  
 docker-compose up --build -d
+
 ```
+
+**Make sure you set the correct database connection information before running the migrations** [Environment variables](#environment-variables)
+Update DB_HOST in .env with mysql container name in docker  
+
+Go Inside container and run these commands
+
+   docker exec -it arcacare_api bash
+    
+    php artisan migrate
+
+    
 
 The api can be accessed at [http://localhost:8000/api/documentation](http://localhost:8000/api/documentation).    
 
-## Authentication
+## Authentication Seeders
 
- you can follow this guide for authentication
- 
-   https://lumen.laravel.com/docs/8.x/authentication
+  #Note : If using docker go inside container to run these commands
+
+  php artisan make:seeder UserSeeder
+
+ Go to arcacare-api/database/seeders/UserSeeder.php and add following content 
+
+    To get Model and Hash password import these modules
+
+    use App\Models\User;
+    use Illuminate\Support\Facades\Hash;
+
+    In Run function add this with updating your own values
+    User::create([
+            'name' => 'your_name',
+            'email' => 'your_name@admin.com',
+            'password' => Hash::make('your_password'),
+            'api_token' => '9e9S2fX4av1wIGLX',    // must be atmost 50 character(alphanumeric) atmost.
+    ]);
+    
+ Go to arcacare-api/database/seeders/DatabaseSeeder.php and add following content in run function
+
+     $this->call([
+            UserSeeder::class,
+        ]);
+
+  Now run this command
+
+     php artisan migrate:refresh --seed  
+
+
+this docs is follow up for api_token authentication
+https://lumen.laravel.com/docs/8.x/authentication
 
 ----------    
 
